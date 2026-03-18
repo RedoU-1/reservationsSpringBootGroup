@@ -5,9 +5,14 @@
 
 package com.example.springboot_app.controller;
 
+import com.example.springboot_app.model.Artist;
+import com.example.springboot_app.model.ArtistType;
 import com.example.springboot_app.model.Show;
 import com.example.springboot_app.model.ShowService;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -35,6 +40,22 @@ public class ShowController {
 	@GetMapping("/shows/{id}")
    	 public String show(Model model, @PathVariable("id") String id) {
 		Show show = service.get(id);
+                
+                //Récupérer les artistes du spectacle et les grouper par type
+        Map<String,ArrayList<Artist>> collaborateurs = new TreeMap<>();
+        
+        for(ArtistType at : show.getArtistTypes()) {
+            String type = at.getType().getType();
+        	
+            if(collaborateurs.get(type) == null) {
+            	collaborateurs.put(type, new ArrayList<>());
+            }
+            
+            collaborateurs.get(type).add(at.getArtist());
+        }
+      
+        model.addAttribute("collaborateurs", collaborateurs);
+
 
 		model.addAttribute("show", show);
 		model.addAttribute("title", "Fiche d'un spectacle");
