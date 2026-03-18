@@ -11,6 +11,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
@@ -62,6 +63,9 @@ public class Show {
 
     @OneToMany(targetEntity = Representation.class, mappedBy = "show")
     private List<Representation> representations = new ArrayList<>();
+
+    @ManyToMany(mappedBy = "shows")
+    private List<ArtistType> artistTypes = new ArrayList<>();
 
     public Show() {
     }
@@ -178,6 +182,28 @@ public class Show {
             if (representation.getLocation().equals(this)) {
                 representation.setLocation(null);
             }
+        }
+
+        return this;
+    }
+
+    public List<ArtistType> getArtistTypes() {
+        return artistTypes;
+    }
+
+    public Show addArtistType(ArtistType artistType) {
+        if (!this.artistTypes.contains(artistType)) {
+            this.artistTypes.add(artistType);
+            artistType.addShow(this);
+        }
+
+        return this;
+    }
+
+    public Show removeArtistType(ArtistType artistType) {
+        if (this.artistTypes.contains(artistType)) {
+            this.artistTypes.remove(artistType);
+            artistType.getShows().remove(this);
         }
 
         return this;
